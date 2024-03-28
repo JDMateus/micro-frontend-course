@@ -1,14 +1,14 @@
-name: deploy-container # Name of the workflow.
+name: deploy-marketing # Name of the workflow.
 
 on:
   push: # Event trigger: This configuration should be triggered on a push event.
     branches: # Branches to watch for push events.
       - main
-    paths: 'container/**' # Paths to watch for changes.
+    paths: 'marketing/**' # Paths to watch for changes.
 
 defaults: # Default settings for all jobs in the workflow.
   run:
-    working-directory: container # Directory for all steps within the job.
+    working-directory: marketing # Directory for all steps within the job.
 
 jobs: # Definition of jobs to be executed in the workflow.
   build: # Name of the job.
@@ -26,12 +26,9 @@ jobs: # Definition of jobs to be executed in the workflow.
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Build React App # Name of the step.
         run: npm install && npm run build # Install dependencies and build the app.
-        env: # Env created
-          PRODUCTION_DOMAIN: ${{ secrets.PRODUCTION_DOMAIN }} # PRODUCTION_DOMAIN created from secrets
-
       - name: Deploy app build to S3 bucket # Name of the step.
         # Synchronize the build output with an S3 bucket
-        run: aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest --delete
+        run: aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/marketing/latest --delete
 
       - name: Invalidating HTML in CloudFront # Name of the step.
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/container/latest/index.html"
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/marketing/latest/remoteEntry.js"
