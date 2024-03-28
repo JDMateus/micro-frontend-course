@@ -15,7 +15,7 @@ jobs: # Definition of jobs to be executed in the workflow.
     runs-on: ubuntu-latest # Type of runner environment for the job.
 
     steps: # List of steps to be executed within the job.
-      - uses: actions/checkout@v2 # Checkout the repository at the latest commit.
+      - uses: actions/checkout@v4 # Checkout the repository at the latest commit.
       - name: Configure AWS Credentials # Name of the step.
         # Step to configure AWS credentials for subsequent AWS CLI commands.
         uses: aws-actions/configure-aws-credentials@v4
