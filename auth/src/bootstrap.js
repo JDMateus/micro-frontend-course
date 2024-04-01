@@ -30,7 +30,7 @@ const mount = (el, { onNavigate, defaultHistory, initialPath }) => {
 
 // Develompent mode
 if (process.env.NODE_ENV === 'development') {
-  const devRoot = document.querySelector('#_marketing-dev-root');
+  const devRoot = document.querySelector('#_auth-dev-root');
   // In isolation
   if (devRoot) mount(devRoot, { defaultHistory: createBrowserHistory() });
 }
