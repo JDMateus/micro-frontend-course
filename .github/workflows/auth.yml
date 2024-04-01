@@ -1,0 +1,34 @@
+name: deploy-auth # Name of the workflow.
+
+on:
+  push: # Event trigger: This configuration should be triggered on a push event.
+    branches: # Branches to watch for push events.
+      - main
+    paths: 'auth/**' # Paths to watch for changes.
+
+defaults: # Default settings for all jobs in the workflow.
+  run:
+    working-directory: auth # Directory for all steps within the job.
+
+jobs: # Definition of jobs to be executed in the workflow.
+  build: # Name of the job.
+    runs-on: ubuntu-latest # Type of runner environment for the job.
+
+    steps: # List of steps to be executed within the job.
+      - uses: actions/checkout@v4 # Checkout the repository at the latest commit.
+      - name: Configure AWS Credentials # Name of the step.
+        # Step to configure AWS credentials for subsequent AWS CLI commands.
+        uses: aws-actions/configure-aws-credentials@v4
+        with: # Input parameters for the action.
+          # AWS keys stored as a GitHub secrets
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build React App # Name of the step.
+        run: npm install && npm run build # Install dependencies and build the app.
+      - name: Deploy app build to S3 bucket # Name of the step.
+        # Synchronize the build output with an S3 bucket
+        run: aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/auth/latest --delete
+
+      - name: Invalidating HTML in CloudFront # Name of the step.
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/auth/latest/remoteEntry.js"
